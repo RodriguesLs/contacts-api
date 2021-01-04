@@ -1,9 +1,9 @@
 class ContactsController < ApplicationController
-  before_action :set_contact, only: [:show, :update, :destroy]
+  before_action :set_contact, only: %i(show update destroy)
 
   # GET /contacts
   def index
-    @contacts = Contact.all
+    @contacts ||= Contact.all
 
     render json: @contacts
   end
@@ -39,13 +39,15 @@ class ContactsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
     def set_contact
-      @contact = Contact.find(params[:id])
+      @contact = Contact.includes(:address, :phones).find(params[:id])
     end
 
-    # Only allow a trusted parameter "white list" through.
     def contact_params
-      params.require(:contact).permit(:name, :email, :kind_id, :remark)
+      params.require(:contact).
+        permit(:name, :email, :kind_id, :remark, 
+          address_attributes: [:street, :neighborhood, :state, :country], 
+          phones_attributes: [:phone_number, :kind_phone_id]
+        )
     end
 end
