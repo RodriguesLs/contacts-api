@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  frontend:
+    image: 'node:10-alpine'
+    working_dir: '/frontend'
+    volumes:
+      - ../contacts-view/:/frontend
+    ports:
+      - '3000:3000'
+    command: 'yarn start'
+    depends_on:
+      - backend
+  
+  backend:
+    build:
+      context: .
+    volumes:
+      - ./:/contacts-api/
+    ports:
+      - '3001:3001'
+    command: 'rails s -b 0.0.0.0 -p 3001'
